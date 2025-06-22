@@ -32,7 +32,8 @@ async def command_start_handler(message: Message, state: FSMContext, bot: Bot) -
     bot_name = await get_bot_name(bot)
     await message.answer(
         text=f"Привет, {message.from_user.first_name}!\n"
-             f"Это Бот - {bot_name}, я задам Вам три вопроса, после чего вы получите бесплатный гайд",
+             f"Это Бот - {bot_name}, я задам вам три вопроса, ответив на которые, вы получите бесплатную памятку\n"
+             f"'Как звучать естественно: фразы, которые вы не найдете в учебниках'",
         reply_markup=start_questionnaire_key,
     )
     await state.set_state(StudentFSM.age)
@@ -66,18 +67,6 @@ class StudentFSM(StatesGroup):
     aim = State()
     tutor = State()
     end = State()
-
-
-@dp.callback_query(F.data == "download_guide")
-async def start_fsm(callback: types.CallbackQuery,state: FSMContext):
-    await callback.answer()
-    await bot.send_message(
-        chat_id=callback.from_user.id,
-        text=f"Привет, {callback.from_user.first_name}!\n"
-             f"Это Бот - {name_bot}, я задам Вам три вопроса, после чего вы получите бесплатный гайд",
-        reply_markup=start_questionnaire_key,
-    )
-    await state.set_state(StudentFSM.age)
 
 
 @dp.callback_query(F.data == "start_questionnaire")
@@ -125,7 +114,8 @@ async def process_gender(callback: types.CallbackQuery, state: FSMContext):
     await callback.answer()
     await bot.send_message(
         chat_id=callback.from_user.id,
-        text="Спасибо за информацию, вот ссылка https://github.com/DrHy6yC/",
+        text="Благодарю за информацию, вот ссылка\n"
+             "https://disk.yandex.ru/i/aTw9iwnuUw_iHA",
     )
     await bot.send_message(
         chat_id=SETTINGS.ID_INFO_CHAT,
