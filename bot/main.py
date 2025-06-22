@@ -7,8 +7,7 @@ from aiogram import Bot, Dispatcher, F, types
 from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import StatesGroup, State
-from aiogram.types import Message, ReplyKeyboardRemove
-
+from aiogram.types import Message, ReplyKeyboardRemove, User
 
 sys.path.append(str(Path(__file__).parent.parent))
 
@@ -21,15 +20,19 @@ dp = Dispatcher()
 
 bot = Bot(token=TOKEN)
 
-name_bot = 'Имя_бота'
+async def get_bot_name(bot_: Bot) -> str:
+    me = await bot_.get_me()
+    return me.username
+
 
 
 # Command handler
 @dp.message(Command("start"))
-async def command_start_handler(message: Message, state: FSMContext) -> None:
+async def command_start_handler(message: Message, state: FSMContext, bot: Bot) -> None:
+    bot_name = await get_bot_name(bot)
     await message.answer(
         text=f"Привет, {message.from_user.first_name}!\n"
-             f"Это Бот - {name_bot}, я задам Вам три вопроса, после чего вы получите бесплатный гайд",
+             f"Это Бот - {bot_name}, я задам Вам три вопроса, после чего вы получите бесплатный гайд",
         reply_markup=start_questionnaire_key,
     )
     await state.set_state(StudentFSM.age)
