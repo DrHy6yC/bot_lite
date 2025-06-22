@@ -1,0 +1,13 @@
+# comment
+    venv
+    postgres-data
+    *.env
+    *.db
+    *.yaml
+    .gitignore
+    .git
+    .idea
+    *__pycache__
+    *.yml
+    Dockerfile
+    .dockerignore
