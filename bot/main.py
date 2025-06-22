@@ -9,80 +9,104 @@ from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import StatesGroup, State
 from aiogram.types import Message, ReplyKeyboardRemove
 
+
 sys.path.append(str(Path(__file__).parent.parent))
 
-from bot.config import settings
-from bot.keyboard import my_button
+from bot.config import SETTINGS
+from bot.keyboard import download_guide_key , start_questionnaire_key, age_key, aim_key, tutor_key
 
-TOKEN = settings.TG_TOKEN
+TOKEN = SETTINGS.TG_TOKEN
 
 dp = Dispatcher()
 
+bot = Bot(token=TOKEN)
 
+name_bot = 'Имя_бота'
 
-# Обработка нажатия на кнопку
-@dp.callback_query(F.data == "btn1")
-async def handle_button1(callback: types.CallbackQuery):
-    await callback.answer("Вы нажали Кнопку 1!", show_alert=True)
 
 # Command handler
 @dp.message(Command("start"))
 async def command_start_handler(message: Message) -> None:
     await message.answer(
-        text="Выберите действие:",
-        reply_markup=my_button,
+        text="Получить гайд",
+        reply_markup=download_guide_key,
     )
 
 
 # Определение состояний
-class Form(StatesGroup):
-    name = State()
+class StudentFSM(StatesGroup):
     age = State()
-    gender = State()
+    aim = State()
+    tutor = State()
+    end = State()
 
 
-# Обработчик команды /start, который запускает FSM
-@dp.message(Command("me"))
-async def cmd_start(message: Message, state: FSMContext):
-    await message.answer(
-        "Привет! Давай познакомимся. Как тебя зовут?",
-        reply_markup=ReplyKeyboardRemove()
+@dp.callback_query(F.data == "download_guide")
+async def start_fsm(callback: types.CallbackQuery,state: FSMContext):
+    await callback.answer()
+    await bot.send_message(
+        chat_id=callback.from_user.id,
+        text=f"Привет, {callback.from_user.first_name}!\n"
+             f"Это Бот - {name_bot}, я задам Вам три вопроса, после чего вы получите бесплатный гайд",
+        reply_markup=start_questionnaire_key,
     )
-    await state.set_state(Form.name)
+    await state.set_state(StudentFSM.age)
 
 
-# Обработчик для состояния имени
-@dp.message(Form.name)
-async def process_name(message: Message, state: FSMContext):
-    await state.update_data(name=message.text)
-    await message.answer("Отлично! Сколько тебе лет?")
-    await state.set_state(Form.age)
+@dp.callback_query(F.data == "start_questionnaire")
+@dp.callback_query(StudentFSM.age)
+async def process_age(callback: types.CallbackQuery, state: FSMContext):
+    await callback.answer()
+    await bot.send_message(
+        chat_id=callback.from_user.id,
+        text="Сколько вам лет?",
+        reply_markup=age_key,
+    )
+    await state.set_state(StudentFSM.aim)
 
 
-# Обработчик для состояния возраста
-@dp.message(Form.age)
-async def process_age(message: Message, state: FSMContext):
-    if not message.text.isdigit():
-        await message.answer("Пожалуйста, введите число!")
-        return
+@dp.callback_query(StudentFSM.aim)
+async def process_aim(callback: types.CallbackQuery, state: FSMContext):
+    await state.update_data(age=callback.data)
+    await callback.answer()
+    await bot.send_message(
+        chat_id=callback.from_user.id,
+        text="С какой целью изучаете/хотите изучать английский?",
+        reply_markup=aim_key
+    )
+    await state.set_state(StudentFSM.tutor)
 
-    await state.update_data(age=int(message.text))
-    await message.answer("Какой у тебя пол? (М/Ж)")
-    await state.set_state(Form.gender)
+
+
+@dp.callback_query(StudentFSM.tutor)
+async def process_tutor(callback: types.CallbackQuery, state: FSMContext):
+    await state.update_data(aim=callback.data)
+    await callback.answer()
+    await bot.send_message(
+        chat_id=callback.from_user.id,
+        text="Занимаетесь ли вы с репетитором на данный момент?",
+        reply_markup=tutor_key,
+    )
+    await state.set_state(StudentFSM.end)
 
 
 # Обработчик для состояния пола
-@dp.message(Form.gender)
-async def process_gender(message: Message, state: FSMContext):
-    gender = message.text.lower()
-    if gender not in ["м", "ж"]:
-        await message.answer("Пожалуйста, введите 'М' или 'Ж'")
-        return
-
+@dp.callback_query(StudentFSM.end)
+async def process_gender(callback: types.CallbackQuery, state: FSMContext):
+    await state.update_data(tutor=callback.data)
     data = await state.get_data()
-    await message.answer(
-        f"Спасибо за информацию!\n"
-        f"Ты: {data['name']}, {data['age']} лет, пол: {'мужской' if gender == 'м' else 'женский'}"
+    await callback.answer()
+    await bot.send_message(
+        chat_id=callback.from_user.id,
+        text="Спасибо за информацию, вот ссылка https://github.com/DrHy6yC/",
+    )
+    await bot.send_message(
+        chat_id=SETTINGS.ID_INFO_CHAT,
+        text=f"Имя: {callback.from_user.full_name},\n"
+             f"Логин: {callback.from_user.username},\n"
+             f"Возраст: {data['age']},\n"
+             f"Цель: {data['aim']},\n"
+             f"Занимается ли с репетитором: {data['tutor']}",
     )
     await state.clear()
 
@@ -93,13 +117,12 @@ async def process_gender(message: Message, state: FSMContext):
 async def cmd_cancel(message: Message, state: FSMContext):
     await state.clear()
     await message.answer(
-        "Опрос прерван",
+        text="Опрос прерван",
         reply_markup=ReplyKeyboardRemove()
     )
 
-# Run the bot
+
 async def main() -> None:
-    bot = Bot(token=TOKEN)
     await dp.start_polling(bot)
 
 
