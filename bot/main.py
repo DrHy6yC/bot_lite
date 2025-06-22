@@ -34,7 +34,10 @@ async def command_start_handler(message: Message, state: FSMContext) -> None:
     )
     await state.set_state(StudentFSM.age)
 
-@dp.message(Command("id_chat"))
+@dp.message(
+    Command("id_chat"),
+    F.from_user.username.in_({SETTINGS.ID_ADMIN, SETTINGS.ID_SUPER_USER})
+)
 async def id_chat_and_user(message: Message) -> None:
     await message.answer(
         text=f"Чат: {message.chat.id}"
