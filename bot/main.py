@@ -26,8 +26,29 @@ name_bot = 'Имя_бота'
 
 # Command handler
 @dp.message(Command("start"))
-async def command_start_handler(message: Message) -> None:
+async def command_start_handler(message: Message, state: FSMContext) -> None:
     await message.answer(
+        text=f"Привет, {message.from_user.first_name}!\n"
+             f"Это Бот - {name_bot}, я задам Вам три вопроса, после чего вы получите бесплатный гайд",
+        reply_markup=start_questionnaire_key,
+    )
+    await state.set_state(StudentFSM.age)
+
+@dp.message(Command("id_chat"))
+async def id_chat_and_user(message: Message) -> None:
+    await message.answer(
+        text=f"Чат: {message.chat.id}"
+             f"Пользователь: {message.from_user.id}",
+    )
+
+
+@dp.message(
+    Command("download"),
+    F.from_user.username.in_({SETTINGS.ID_ADMIN, SETTINGS.ID_SUPER_USER})
+)
+async def get_download(message: Message) -> None:
+    await bot.send_message(
+        chat_id=SETTINGS.ID_CHANNEL,
         text="Получить гайд",
         reply_markup=download_guide_key,
     )

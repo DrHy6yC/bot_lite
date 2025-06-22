@@ -4,7 +4,7 @@ from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 download_guide_key = InlineKeyboardMarkup(
     inline_keyboard=[
         [
-            InlineKeyboardButton(text="Скачать!", callback_data="download_guide"),
+            InlineKeyboardButton(text="Скачать!", url="https://t.me/QuickQuizFreeBot"),
         ],
     ]
 )
