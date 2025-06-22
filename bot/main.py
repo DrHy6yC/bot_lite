@@ -56,7 +56,7 @@ async def id_chat_and_user(message: Message) -> None:
 async def get_download(message: Message) -> None:
     await bot.send_message(
         chat_id=SETTINGS.ID_CHANNEL,
-        text="Получить гайд",
+        text="Получить памятку",
         reply_markup=download_guide_key,
     )
 
