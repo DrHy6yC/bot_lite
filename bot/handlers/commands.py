@@ -3,7 +3,7 @@ from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
 from aiogram.types import Message, ReplyKeyboardRemove
 
-from bot.keyboard import start_questionnaire_key
+from bot.keyboard import start_key
 from bot.state.state import LidFSM
 from bot.utils import get_bot_name
 
@@ -16,9 +16,10 @@ async def command_start(message: Message, state: FSMContext, bot: Bot) -> None:
     bot_name = await get_bot_name(bot)
     await message.answer(
         text=f"Привет, {message.from_user.first_name}!\n"
-             f"Это Бот - {bot_name}, я задам вам три вопроса, ответив на которые, вы получите бесплатную памятку\n"
-             f"'Как звучать естественно: фразы, которые вы не найдете в учебниках'",
-        reply_markup=start_questionnaire_key,
+             f"Меня зовут {bot_name}, я бот-помощник репетитора английского Элизабет.\n"
+             f"Я умею проводить краткие опросы, высылать вам полезные материалы, записывать вас на пробное занятие.\n"
+             f"В будущем я буду развиваться, так что stay tuned!",
+        reply_markup=start_key,
     )
     await state.set_state(LidFSM.age)
     await message.delete()

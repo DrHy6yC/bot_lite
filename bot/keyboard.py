@@ -1,10 +1,13 @@
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
 
-download_guide_key = InlineKeyboardMarkup(
+start_key = InlineKeyboardMarkup(
     inline_keyboard=[
         [
-            InlineKeyboardButton(text="Скачать!", url="https://t.me/QuickQuizFreeBot"),
+            InlineKeyboardButton(text="К памятке", callback_data="start_questionnaire"),
+        ],
+        [
+            InlineKeyboardButton(text="Записаться на бесплатное пробное занятие", url="https://t.me/m/oezso4AyYzNi"),
         ],
     ]
 )
@@ -12,7 +15,15 @@ download_guide_key = InlineKeyboardMarkup(
 start_questionnaire_key = InlineKeyboardMarkup(
     inline_keyboard=[
         [
-            InlineKeyboardButton(text="Начать опрос", callback_data="start_questionnaire"),
+            InlineKeyboardButton(text="Получить памятку", callback_data="get_guide"),
+        ],
+    ]
+)
+start_alert_key = InlineKeyboardMarkup(
+    inline_keyboard=[
+        [
+            InlineKeyboardButton(text="Да", url="https://t.me/QuickQuizFreeBot"),
+            InlineKeyboardButton(text="Нет", url="https://t.me/QuickQuizFreeBot"),
         ],
     ]
 )

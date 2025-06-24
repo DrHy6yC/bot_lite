@@ -5,7 +5,7 @@ from aiogram.types import  Message
 
 from bot.config import SETTINGS
 from bot.create_bot import bot
-from bot.keyboard import download_guide_key
+from bot.keyboard import start_questionnaire_key
 
 
 router = Router(name="router_admin")
@@ -30,5 +30,5 @@ async def get_download(message: Message) -> None:
     await bot.send_message(
         chat_id=SETTINGS.ID_CHANNEL,
         text="Получить памятку",
-        reply_markup=download_guide_key,
+        reply_markup=start_questionnaire_key,
     )

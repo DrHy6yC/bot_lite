@@ -1,19 +1,51 @@
 from aiogram import F, Router
+from aiogram.enums import ChatMemberStatus
 from aiogram.exceptions import TelegramBadRequest
 from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery, InlineKeyboardMarkup
 
 from bot.config import SETTINGS
 from bot.create_bot import bot
-from bot.keyboard import  age_key, aim_key, tutor_key, signup_key
+from bot.keyboard import age_key, aim_key, tutor_key, signup_key, start_questionnaire_key, start_alert_key
 from bot.state.state import LidFSM
 
 
 router = Router(name="get_natural_english_guide")
 
 
-@router.callback_query(LidFSM.age, F.data == "start_questionnaire")
+@router.callback_query(F.data == "start_questionnaire")
+async def start_questionnaire(callback: CallbackQuery, state: FSMContext):
+    chat_member = await bot.get_chat_member(
+        chat_id=callback.from_user.id,
+        user_id=bot.id
+    )
+    is_bot_chat_exists = chat_member.status != ChatMemberStatus.LEFT
+    print(is_bot_chat_exists)
+    if is_bot_chat_exists:
+        await bot.send_message(
+            chat_id=callback.from_user.id,
+            text=f"Привет, {callback.from_user.first_name}!\n"
+                 f"Я задам вам три вопроса, ответив на которые, вы получите бесплатную памятку\n"
+                 f"'Как звучать естественно: фразы, которые вы не найдете в учебниках'",
+            reply_markup=start_questionnaire_key,
+        )
+        await state.set_state(LidFSM.age)
+    else:
+        await callback.answer(
+            text = "Сначала напиши боту",
+            show_alert = True
+        )
+        await callback.message.answer(
+            "Перейти в бота?",
+            reply_markup=start_alert_key
+        )
+    await callback.message.delete()
+
+
+@router.callback_query(F.data == "get_guide")
+@router.callback_query(LidFSM.age)
 async def process_age(callback: CallbackQuery, state: FSMContext) -> None:
+    await state.set_state(LidFSM.age)
     await callback.answer()
     await callback.message.delete()
     await bot.send_message(
