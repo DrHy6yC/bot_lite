@@ -3,143 +3,18 @@ import logging
 import sys
 from pathlib import Path
 
-from aiogram import Bot, Dispatcher, F, types
-from aiogram.filters import Command
-from aiogram.fsm.context import FSMContext
-from aiogram.fsm.state import StatesGroup, State
-from aiogram.types import Message, ReplyKeyboardRemove, User
-
 sys.path.append(str(Path(__file__).parent.parent))
 
-from bot.config import SETTINGS
-from bot.keyboard import download_guide_key , start_questionnaire_key, age_key, aim_key, tutor_key
-
-TOKEN = SETTINGS.TG_TOKEN
-
-dp = Dispatcher()
-
-bot = Bot(token=TOKEN)
-
-async def get_bot_name(bot_: Bot) -> str:
-    me = await bot_.get_me()
-    return me.username
-
-
-
-# Command handler
-@dp.message(Command("start"))
-async def command_start_handler(message: Message, state: FSMContext, bot: Bot) -> None:
-    bot_name = await get_bot_name(bot)
-    await message.answer(
-        text=f"Привет, {message.from_user.first_name}!\n"
-             f"Это Бот - {bot_name}, я задам вам три вопроса, ответив на которые, вы получите бесплатную памятку\n"
-             f"'Как звучать естественно: фразы, которые вы не найдете в учебниках'",
-        reply_markup=start_questionnaire_key,
-    )
-    await state.set_state(StudentFSM.age)
-
-@dp.message(
-    Command("id_chat"),
-    F.from_user.username.in_({SETTINGS.ID_ADMIN, SETTINGS.ID_SUPER_USER})
-)
-async def id_chat_and_user(message: Message) -> None:
-    await message.answer(
-        text=f"Чат: {message.chat.id}"
-             f"Пользователь: {message.from_user.id}",
-    )
-
-
-@dp.message(
-    Command("download"),
-    F.from_user.username.in_({SETTINGS.ID_ADMIN, SETTINGS.ID_SUPER_USER})
-)
-async def get_download(message: Message) -> None:
-    await bot.send_message(
-        chat_id=SETTINGS.ID_CHANNEL,
-        text="Получить памятку",
-        reply_markup=download_guide_key,
-    )
-
-
-# Определение состояний
-class StudentFSM(StatesGroup):
-    age = State()
-    aim = State()
-    tutor = State()
-    end = State()
-
-
-@dp.callback_query(F.data == "start_questionnaire")
-@dp.callback_query(StudentFSM.age)
-async def process_age(callback: types.CallbackQuery, state: FSMContext):
-    await callback.answer()
-    await bot.send_message(
-        chat_id=callback.from_user.id,
-        text="Сколько вам лет?",
-        reply_markup=age_key,
-    )
-    await state.set_state(StudentFSM.aim)
-
-
-@dp.callback_query(StudentFSM.aim)
-async def process_aim(callback: types.CallbackQuery, state: FSMContext):
-    await state.update_data(age=callback.data)
-    await callback.answer()
-    await bot.send_message(
-        chat_id=callback.from_user.id,
-        text="С какой целью изучаете/хотите изучать английский?",
-        reply_markup=aim_key
-    )
-    await state.set_state(StudentFSM.tutor)
-
-
-
-@dp.callback_query(StudentFSM.tutor)
-async def process_tutor(callback: types.CallbackQuery, state: FSMContext):
-    await state.update_data(aim=callback.data)
-    await callback.answer()
-    await bot.send_message(
-        chat_id=callback.from_user.id,
-        text="Занимаетесь ли вы с репетитором на данный момент?",
-        reply_markup=tutor_key,
-    )
-    await state.set_state(StudentFSM.end)
-
-
-# Обработчик для состояния пола
-@dp.callback_query(StudentFSM.end)
-async def process_gender(callback: types.CallbackQuery, state: FSMContext):
-    await state.update_data(tutor=callback.data)
-    data = await state.get_data()
-    await callback.answer()
-    await bot.send_message(
-        chat_id=callback.from_user.id,
-        text="Благодарю за информацию, вот ссылка\n"
-             "https://disk.yandex.ru/i/aTw9iwnuUw_iHA",
-    )
-    await bot.send_message(
-        chat_id=SETTINGS.ID_INFO_CHAT,
-        text=f"Имя: {callback.from_user.full_name},\n"
-             f"Логин: {callback.from_user.username},\n"
-             f"Возраст: {data['age']},\n"
-             f"Цель: {data['aim']},\n"
-             f"Занимается ли с репетитором: {data['tutor']}",
-    )
-    await state.clear()
-
-
-# Обработчик команды /cancel для выхода из FSM
-@dp.message(Command("cancel"))
-@dp.message(Command("отмена"))
-async def cmd_cancel(message: Message, state: FSMContext):
-    await state.clear()
-    await message.answer(
-        text="Опрос прерван",
-        reply_markup=ReplyKeyboardRemove()
-    )
+from bot.create_bot import bot, dp
+from bot.handlers.admin import router as router_admin
+from bot.handlers.commands import router as router_commands
+from bot.handlers.get_natural_english_guide import router as router_get_natural_english_guide
 
 
 async def main() -> None:
+    dp.include_router(router_admin)
+    dp.include_router(router_commands)
+    dp.include_router(router_get_natural_english_guide)
     await dp.start_polling(bot)
 
 

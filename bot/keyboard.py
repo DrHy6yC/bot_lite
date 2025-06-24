@@ -61,3 +61,11 @@ tutor_key = InlineKeyboardMarkup(
         ]
     ]
 )
+
+signup_key = InlineKeyboardMarkup(
+    inline_keyboard=[
+        [
+            InlineKeyboardButton(text="Записаться на бесплатное пробное занятие", url="https://t.me/m/oezso4AyYzNi"),
+        ]
+    ]
+)
