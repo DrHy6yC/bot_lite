@@ -30,6 +30,7 @@ async def start_questionnaire(callback: CallbackQuery, state: FSMContext):
             reply_markup=start_questionnaire_key,
         )
         await state.set_state(LidFSM.age)
+    # TODO Убрать, так как не работает как нужно
     else:
         await callback.answer(
             text = "Сначала напиши боту",

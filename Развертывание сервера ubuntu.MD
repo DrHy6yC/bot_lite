@@ -67,3 +67,19 @@ sudo systemctl enable docker
 `````
 sudo systemctl status docker
 `````
+
+### Установка Nginx
+`````
+sudo apt update
+sudo apt upgrade -y
+
+sudo apt install nginx -y
+
+sudo systemctl start nginx
+sudo systemctl enable nginx  # Добавляет в автозагрузку
+sudo systemctl status nginx  # Проверка статуса (должен быть `active (running)`)
+
+sudo ufw allow 80/tcp  # HTTP
+sudo ufw allow 443/tcp  # HTTPS (если планируется SSL)
+sudo ufw enable
+`````
