@@ -1,5 +1,13 @@
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
+channel_button = InlineKeyboardMarkup(
+    inline_keyboard=[
+        [
+            InlineKeyboardButton(text="⚠️ Хочу говорить ярко!", callback_data="channel_button"),
+        ],
+    ]
+)
+
 
 start_key = InlineKeyboardMarkup(
     inline_keyboard=[
@@ -77,6 +85,58 @@ signup_key = InlineKeyboardMarkup(
     inline_keyboard=[
         [
             InlineKeyboardButton(text="Записаться на бесплатное пробное занятие", url="https://t.me/m/oezso4AyYzNi"),
+        ]
+    ]
+)
+
+emoji_key = InlineKeyboardMarkup(
+    inline_keyboard=[
+        [
+            InlineKeyboardButton(
+                text="😴 🧠 😮‍💨 - super tired",
+                callback_data="super_tired"
+            ),
+        ],
+        [
+            InlineKeyboardButton(
+                text="🏃‍♂️ 🧃 😅 - extremely motivated",
+                callback_data="extremely_motivated"
+            ),
+        ],
+        [
+            InlineKeyboardButton(
+                text="🤯 ☕️ 😬 - anxious",
+                callback_data="anxious"
+            ),
+        ],
+        [
+            InlineKeyboardButton(
+                text="⚡️😇 🤘- full of energy",
+                callback_data="full_of_energy"
+            ),
+        ],
+        [
+            InlineKeyboardButton(
+                text="🤷‍♀️ 🤷‍♂️ - idk",
+                callback_data="idk"
+            ),
+        ],
+    ]
+)
+
+choice_key = InlineKeyboardMarkup(
+    inline_keyboard=[
+        [
+            InlineKeyboardButton(
+                text="Хочу пробное занятие",
+                url="https://t.me/m/oezso4AyYzNi",
+            ),
+        ],
+        [
+            InlineKeyboardButton(
+                text="А я уже занимаюсь с вами :)",
+                url="t.me/englishyes_elizaveta",
+            ),
         ]
     ]
 )

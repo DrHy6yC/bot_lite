@@ -36,10 +36,6 @@ async def start_questionnaire(callback: CallbackQuery, state: FSMContext):
             text = "Сначала напиши боту",
             show_alert = True
         )
-        await callback.message.answer(
-            "Перейти в бота?",
-            reply_markup=start_alert_key
-        )
     await callback.message.delete()
 
 

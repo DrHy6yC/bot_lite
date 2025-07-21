@@ -7,6 +7,7 @@ class Settings(BaseSettings):
     ID_CHANNEL: str
     ID_ADMIN: str
     ID_SUPER_USER: str
+    NAME_BOT: str
 
     model_config = SettingsConfigDict(env_file=".env")
 
