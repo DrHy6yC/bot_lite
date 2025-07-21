@@ -29,7 +29,7 @@ async def start_get_free_guide(callback: CallbackQuery):
                  f" Вот твой гайд: «Сила наречий"
                  f" и прилагательных в английском» ⤵️",
         )
-        file_id = "BQACAgIAAxkBAAIUwWh-E7idRCQRfduJjfPXF_4VhjVXAAJIeAACXi7wSwtPIyKUCK9DNgQ"
+        file_id = "BQACAgIAAxkBAAP1aH4hxbgx97jU8cImLC8_VAor8oQAAmdyAAIl9fBLniC9XHsm0KQ2BA"
         await bot.send_document(
             chat_id=callback.from_user.id, document=file_id)
         # TODO Сделать задачи в celery
